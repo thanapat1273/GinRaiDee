@@ -1,6 +1,7 @@
 # กินอะไรดี — App Concept
 
 Status: concept v1, 2026-11-05. A personal project: a system that helps me decide what to eat.
+Detailed design and learning notes: [docs/](docs/README.md). Where they differ from this file (data sources, ranking), the docs are newer.
 Working name: undecided (candidates: กินยัง / KinYang, หิวยัง, อิ่มดี).
 
 ## 1. What it is
@@ -107,7 +108,7 @@ Simple rules and weights rank the dishes. The LLM only (a) turns chat into const
 | `user_profile` | hard diet rules, taste vector, saved personas |
 | `event` | shown / accepted / rejected(reason) / ate(source: tap, check-in, photo, chat) / rating / mood |
 
-### Scoring (v1, hand-set weights)
+### Scoring (v1, hand-set weights; superseded by [linear Thompson sampling](docs/design/02-recommender.md))
 ```
 score(dish) = taste_affinity
             + context_fit(time, weather)

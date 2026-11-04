@@ -1,0 +1,21 @@
+# dependencies and builds
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# secrets and personal data: never commit (public repo)
+.env
+.env.*
+!.env.example
+data/local/
+
+# python
+__pycache__/
+.venv/
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
