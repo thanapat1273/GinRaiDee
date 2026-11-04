@@ -1,0 +1,62 @@
+# CI: on every pull request (and every push to main), a fresh Linux machine installs the
+# project from scratch and checks it. A ✅ means "this would work on a clean machine", not
+# just on mine. Explained step by step in docs/learn/03-ci-cd.md.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# The workflow only reads the code. Least privilege: it can't push or change settings.
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older, now-pointless run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast checks that need no database: types, unit tests, and a production build of the web app.
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7          # get the code
+      - uses: actions/setup-node@v7        # install Node, and cache npm downloads between runs
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci                        # exact versions from package-lock.json, nothing else
+      - run: npm run typecheck             # TypeScript across api and web
+      - run: npm test                      # unit tests: parser, critiques, Thompson sampling, …
+      - run: npm run build -w apps/web     # can the web app actually be built for production?
+
+  # The real thing, end to end: build our Postgres image, run migrations and the seed,
+  # start the API, and drive it through suggest → critique → log → accept.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: checks                          # don't spend minutes here if the fast checks failed
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Start Postgres (PostGIS + pgvector)
+        run: npm run db:up
+      - name: Migrate and seed
+        run: npm run db:migrate && npm run db:seed
+      - name: Start the API in the background
+        run: |
+          npm run start -w apps/api > api.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8787/api/status > /dev/null && exit 0; sleep 1; done
+          cat api.log; exit 1
+      - name: Smoke test
+        run: npm run smoke -w apps/api
+      - name: API log (only shown if something failed)
+        if: failure()
+        run: cat api.log

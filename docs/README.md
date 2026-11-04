@@ -10,6 +10,7 @@ Two kinds of document: **learn/** explains how recommendation and food data work
 4. [Design: the recommender](design/02-recommender.md): the cascade that answers "กินอะไรดี?".
 5. [Design: evaluation](design/03-evaluation.md): what's logged and how to tell if it's improving.
 6. [Decision log](decisions.md).
+7. [CI/CD](learn/03-ci-cd.md): what it is, why this repo runs CI on every PR, and when CD will matter.
 
 ## Where the design lives in code
 

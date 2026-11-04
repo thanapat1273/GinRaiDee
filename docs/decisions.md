@@ -4,6 +4,7 @@ Newest first. Each line links to where the reasoning lives.
 
 | Date | Decision | Instead of | Why | Detail |
 |---|---|---|---|---|
+| 2026-11-05 | CI on GitHub Actions (checks + end-to-end); no CD until something is deployed | No CI, or CD now | Catches Linux-only and cross-part breakage for free; nothing to deploy yet | [CI/CD](learn/03-ci-cd.md) |
 | 2026-11-05 | Local web app first; LINE bot later reuses the same API | Building the LINE bot first | Faster to test with our own UI | [README](../README.md) |
 | 2026-11-05 | Postgres + PostGIS + pgvector in Docker | SQLite | Matches the final design | `db/` |
 | 2026-11-05 | React + Vite + TypeScript UI, separate Hono API | Next.js | Portfolio value; keeps the API channel-agnostic | `apps/` |
